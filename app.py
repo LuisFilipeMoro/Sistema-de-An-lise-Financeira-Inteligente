@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Configuração da página
+#ConfiguraçãoPágina
 
 st.set_page_config(page_title="Sistema de Análise Financeira Inteligente", page_icon="💹", layout="wide")
 
@@ -11,34 +11,34 @@ st.title("💹 Sistema de Análise Financeira Inteligente")
 st.markdown("### – Gestão e Inovação Digital ")
 st.write("Envie um arquivo CSV com dados financeiros ou preços de ativos para realizar a análise automática.")
 
-# Upload do arquivo
+#UploadArquivo
 
 arquivo = st.file_uploader("📁 Envie seu arquivo CSV", type=["csv"])
 
 if arquivo is not None:
-    # Leitura dos dados
+    #LerDados
     df = pd.read_csv(arquivo)
     st.subheader("📊 Visualização dos Dados")
     st.write(df.head())
 
-    # Verifica se há pelo menos 2 colunas numéricas
+    #Verifica >=2 colunas numéricas
     colunas_numericas = df.select_dtypes(include=[np.number]).columns.tolist()
     if len(colunas_numericas) < 2:
         st.error("O arquivo deve conter pelo menos duas colunas numéricas (ex: preços ou valores financeiros).")
     else:
-        # Cálculo dos retornos logarítmicos
+        #CálculoRetornosLogarítmicos
 
         precos = df[colunas_numericas].values
         retornos = np.log(precos[1:] / precos[:-1])
         nomes = colunas_numericas
 
-        # Retorno e volatilidade
+        #RetornoVolatilidade
         retorno_medio_diario = np.mean(retornos, axis=0)
         volatilidade_diaria = np.std(retornos, axis=0)
         retorno_anual = retorno_medio_diario * 252
         volatilidade_anual = volatilidade_diaria * np.sqrt(252)
 
-        # Exibir métricas
+        #ExibirMétricas
         st.subheader("📈 Métricas Financeiras (Anualizadas)")
         resultados = pd.DataFrame({
             "Ativo": nomes,
@@ -47,7 +47,7 @@ if arquivo is not None:
         })
         st.dataframe(resultados.style.format({"Retorno Anual (%)": "{:.2f}", "Volatilidade Anual (%)": "{:.2f}"}))
 
-        # Matriz de Covariância e Correlação
+        #MatrizCovariânciaCorrelação
         matriz_cov = np.cov(retornos, rowvar=False)
         matriz_corr = np.corrcoef(retornos, rowvar=False)
 
@@ -58,7 +58,7 @@ if arquivo is not None:
         st.dataframe(pd.DataFrame(matriz_corr, index=nomes, columns=nomes).style.format("{:.3f}"))
 
        
-        # Simulação de Monte Carlo (simplificada)
+        #Simulação de Monte Carlo
         st.subheader("🎲 Simulação de Monte Carlo (Portfólio Equilibrado)")
         pesos = np.array([1 / len(nomes)] * len(nomes))
         num_simulacoes = 5000
@@ -79,7 +79,7 @@ if arquivo is not None:
         st.metric("Value at Risk (95%)", f"{var_95 * 100:.2f}%")
         st.metric("Média dos Retornos Simulados", f"{np.mean(simulacoes) * 100:.2f}%")
 
-        # Gráfico de distribuição dos retornos simulados
+        #GráficoDistribuiçãoRetornosSimulados
         fig, ax = plt.subplots(figsize=(8, 4))
         ax.hist(simulacoes, bins=40, color='skyblue', edgecolor='black', alpha=0.7)
         ax.axvline(var_95, color='red', linestyle='dashed', linewidth=2, label=f'VaR 95%: {var_95*100:.2f}%')
@@ -87,7 +87,7 @@ if arquivo is not None:
         ax.legend()
         st.pyplot(fig)
 
-        # Recomendações simples
+        #RecomendaçõesSimples
         st.subheader("💡 Recomendações Automáticas")
         melhor_ativo = nomes[np.argmax(retorno_anual)]
         mais_arriscado = nomes[np.argmax(volatilidade_anual)]
